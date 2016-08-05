@@ -21,6 +21,7 @@ Module allowing to perform unitary action test
 #include "toaster_msgs/PutInHand.h"
 #include "toaster_msgs/RemoveFromHand.h"
 #include "toaster_msgs/ObjectListStamped.h"
+#include "head_manager/Action.h"
 
 #include <iostream>
 #include <string>
@@ -44,6 +45,9 @@ actionlib::SimpleActionClient<pr2motion::Gripper_Left_OperateAction>* PR2motion_
 actionlib::SimpleActionClient<pr2motion::Head_Move_TargetAction>* head_action_client;
 actionlib::SimpleActionClient<pr2_controllers_msgs::Pr2GripperCommandAction>* gripper_right;
 actionlib::SimpleActionClient<pr2_controllers_msgs::Pr2GripperCommandAction>* gripper_left;
+
+std::string robotState="Waiting";
+std::string object="";
 
 /*
 Find a plan with gtp and return the corresponding id (-1 if no solution found)
@@ -413,7 +417,20 @@ Service call to execute an action
 */
 bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::ExecuteAction::Response &res){
 
-    lookAt(req);
+    std::string object="";
+    //first we choose the object
+    if(req.actionName == "pick"){
+        object = req.object;
+    }else if(req.actionName == "place"){
+        object = req.support;
+    }else if(req.actionName == "drop"){
+        object = req.container;
+    }
+    head_manager::Action msg;
+    msg.request.acting=true;
+    msg.request.object=object;
+    ros::service::call("head_manager/robot_action",msg);
+    //lookAt(req);
     int gtpId = planGTP(req);
 
     if(gtpId != -1){
@@ -422,6 +439,9 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
 
     ROS_INFO("[action_tester] Action executed: id = %d", gtpId);
 
+    msg.request.acting=false;
+    msg.request.object="";
+    ros::service::call("head_manager/robot_action",msg);
     return true;
 }
 
@@ -456,7 +476,7 @@ Service call to execute an action
 */
 bool planService(action_tester::ExecuteAction::Request  &req, action_tester::ExecuteAction::Response &res){
 
-    lookAt(req);
+    //lookAt(req);
     int gtpId = planGTP(req);
 
     ROS_INFO("[action_tester] Action planned: id = %d", gtpId);
@@ -472,7 +492,7 @@ Service call to execute a gtp task
 */
 bool execTask(action_tester::ExecuteTask::Request  &req, action_tester::ExecuteTask::Response &res){
 
-    lookAt(gtpTasks[req.id]);
+    //lookAt(gtpTasks[req.id]);
     execGtpTask(gtpTasks[req.id], req.id);
 
     return true;
