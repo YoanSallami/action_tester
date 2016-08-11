@@ -21,7 +21,7 @@ Module allowing to perform unitary action test
 #include "toaster_msgs/PutInHand.h"
 #include "toaster_msgs/RemoveFromHand.h"
 #include "toaster_msgs/ObjectListStamped.h"
-#include "head_manager/Action.h"
+#include <head_manager/Action.h>
 
 #include <iostream>
 #include <string>
@@ -419,18 +419,22 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
 
     std::string object="";
     //first we choose the object
-    if(req.actionName == "pick"){
+    if(req.actionName == "pick")
         object = req.object;
-    }else if(req.actionName == "place"){
+    if(req.actionName == "place")
         object = req.support;
-    }else if(req.actionName == "drop"){
+    if(req.actionName == "drop")
         object = req.container;
+
+    head_manager::Action msg_srv;
+    msg_srv.request.acting=true;
+    msg_srv.request.object=object;
+
+    if (ros::service::call("head_manager/robot_action",msg_srv))
+    {
+      ROS_INFO("Changing robot activity state to : ACTING");
     }
-    head_manager::Action msg;
-    msg.request.acting=true;
-    msg.request.object=object;
-    ros::service::call("head_manager/robot_action",msg);
-    //lookAt(req);
+
     int gtpId = planGTP(req);
 
     if(gtpId != -1){
@@ -439,9 +443,12 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
 
     ROS_INFO("[action_tester] Action executed: id = %d", gtpId);
 
-    msg.request.acting=false;
-    msg.request.object="";
-    ros::service::call("head_manager/robot_action",msg);
+    msg_srv.request.acting=false;
+    msg_srv.request.object="";
+    if (ros::service::call("head_manager/robot_action",msg_srv))
+    {
+      ROS_INFO("Changing robot activity state to : ACTING");
+    }
     return true;
 }
 
