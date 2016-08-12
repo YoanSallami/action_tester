@@ -22,6 +22,7 @@ Module allowing to perform unitary action test
 #include "toaster_msgs/RemoveFromHand.h"
 #include "toaster_msgs/ObjectListStamped.h"
 #include <head_manager/Action.h>
+#include <head_manager/Signal.h>
 
 #include <iostream>
 #include <string>
@@ -48,6 +49,7 @@ actionlib::SimpleActionClient<pr2_controllers_msgs::Pr2GripperCommandAction>* gr
 
 std::string robotState="Waiting";
 std::string object="";
+ros::Publisher signal_pub_;
 
 /*
 Find a plan with gtp and return the corresponding id (-1 if no solution found)
@@ -418,19 +420,40 @@ Service call to execute an action
 bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::ExecuteAction::Response &res){
 
     std::string object="";
+    head_manager::Signal sig;
     //first we choose the object
-    if(req.actionName == "pick")
+    if(req.actionName == "pick"){
         object = req.object;
-    if(req.actionName == "place")
+        sig.entities[0]=object;
+        sig.durations[0]=1.0;
+        sig.urgency=0.98;
+        sig.importancy=0.9;
+    }
+    if(req.actionName == "place"){
         object = req.support;
-    if(req.actionName == "drop")
+        sig.entities[0]=req.object;
+        sig.durations[0]=0.5;
+        sig.entities[0]=req.support;
+        sig.durations[0]=1.5;
+        sig.urgency=0.98;
+        sig.importancy=0.9;
+      }
+    if(req.actionName == "drop"){
         object = req.container;
-
+        sig.entities[0]=req.object;
+        sig.durations[0]=0.5;
+        sig.entities[0]=req.container;
+        sig.durations[0]=1.5;
+        sig.urgency=0.98;
+        sig.importancy=0.9;
+      }
+    signal_pub_.publish(sig);
+        
     head_manager::Action msg_srv;
     msg_srv.request.acting=true;
     msg_srv.request.object=object;
 
-    if (ros::service::call("head_manager/robot_action",msg_srv))
+    if (ros::service::call("/robot_action",msg_srv))
     {
       ROS_INFO("Changing robot activity state to : ACTING");
     }
@@ -445,7 +468,7 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
 
     msg_srv.request.acting=false;
     msg_srv.request.object="";
-    if (ros::service::call("head_manager/robot_action",msg_srv))
+    if (ros::service::call("/robot_action",msg_srv))
     {
       ROS_INFO("Changing robot activity state to : ACTING");
     }
@@ -514,6 +537,7 @@ int main (int argc, char **argv)
   ROS_INFO("[action_tester] Init action_tester");
  
   //Services declarations
+  signal_pub_ = _node.advertise <head_manager::Signal> ("head_manager/signal", 10);
   ros::ServiceServer service_action = _node.advertiseService("action_tester/execute_action", execAction);
   ros::ServiceServer service_task = _node.advertiseService("action_tester/execute_gtp_task", execTask);
   ros::ServiceServer service_subtraj = _node.advertiseService("action_tester/execute_subtraj", execSubTraj);
