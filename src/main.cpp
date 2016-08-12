@@ -421,24 +421,48 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
 
     std::string object="";
     head_manager::Signal sig;
-    std::string command;
+    
     //first we choose the object
     if(req.actionName == "pick"){
-      object=req.object;
-      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\']\r\nentities: [\'"+req.object+"\']\r\ndurations: [1.0]\r\nurgency: 0.8\r\nimportancy : 0.8\r\nweight: 0.8\"";
-      system(command.c_str());
+        object = req.object;
+        // std::string entities[1];
+        // double durations[1];
+        // entities[0]=req.object;
+        // durations[0]=1.0;
+        // sig.entities=entities;
+        // sig.durations=durations;
+        // sig.urgency=0.98;
+        // sig.importancy=0.9;
     }
     if(req.actionName == "place"){
-      object=req.support;
-      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\']\r\nentities: [\'"+req.object+"\',\'"+req.support+"\']\r\ndurations: [0.7,1.5]\r\nurgency: 0.8\r\nimportancy : 0.8\r\nweight: 0.8\"";
-      system(command.c_str());
+        object = req.support;
+        // std::string entities[2];
+        // double durations[2];
+        // entities[0]=req.object;
+        // entities[1]=req.support;
+        // durations[0]=0.5;
+        // durations[1]=1.5;
+        // sig.entities=entities;
+        // sig.durations=durations;
+        // sig.urgency=0.98;
+        // sig.importancy=0.9;
       }
     if(req.actionName == "drop"){
-      object=req.container;
-      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\']\r\nentities: [\'"+req.object+"\',\'"+req.container+"\']\r\ndurations: [0.7,1.5]\r\nurgency: 0.8\r\nimportancy : 0.8\r\nweight: 0.8\"";
-      system(command.c_str());
+        object = req.container;
+        // std::string entities[2];
+        // double durations[2];
+        // entities[0]=req.object;
+        // entities[1]=req.container;
+        // durations[0]=1.5
+        // durations[1]=0.5;
+        // sig.entities=entities;
+        // sig.durations=durations;
+        // sig.urgency=0.98;
+        // sig.importancy=0.9;
       }
-    ROS_INFO("-- TEST --"); 
+    // ROS_INFO("publishing %s signal",req.actionName.c_str()); 
+    // signal_pub_.publish(sig);
+    
     head_manager::Action msg_srv;
     msg_srv.request.acting=true;
     msg_srv.request.object=object;
