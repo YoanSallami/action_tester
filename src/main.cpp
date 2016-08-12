@@ -433,8 +433,8 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
         object = req.support;
         sig.entities[0]=req.object;
         sig.durations[0]=0.5;
-        sig.entities[0]=req.support;
-        sig.durations[0]=1.5;
+        sig.entities[1]=req.support;
+        sig.durations[1]=1.5;
         sig.urgency=0.98;
         sig.importancy=0.9;
       }
@@ -442,13 +442,13 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
         object = req.container;
         sig.entities[0]=req.object;
         sig.durations[0]=0.5;
-        sig.entities[0]=req.container;
-        sig.durations[0]=1.5;
+        sig.entities[1]=req.container;
+        sig.durations[1]=1.5;
         sig.urgency=0.98;
         sig.importancy=0.9;
       }
     signal_pub_.publish(sig);
-        
+    ROS_INFO("-- TEST --"); 
     head_manager::Action msg_srv;
     msg_srv.request.acting=true;
     msg_srv.request.object=object;
