@@ -424,15 +424,18 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
     std::string command;
     //first we choose the object
     if(req.actionName == "pick"){
-      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\'] entities: [\'"+req.object+"\'] durations: [1.0] urgency: 0.8 importancy : 0.8 weight: 0.8\"";
+      object=req.object;
+      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\']\r\nentities: [\'"+req.object+"\']\r\ndurations: [1.0]\r\nurgency: 0.8\r\nimportancy : 0.8\r\nweight: 0.8\"";
       system(command.c_str());
     }
     if(req.actionName == "place"){
-      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\'] entities: [\'"+req.object+"\',\'"+req.support+"\'] durations: [0.7,1.5] urgency: 0.8 importancy : 0.8 weight: 0.8\"";
+      object=req.support;
+      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\']\r\nentities: [\'"+req.object+"\',\'"+req.support+"\']\r\ndurations: [0.7,1.5]\r\nurgency: 0.8\r\nimportancy : 0.8\r\nweight: 0.8\"";
       system(command.c_str());
       }
     if(req.actionName == "drop"){
-      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\'] entities: [\'"+req.object+"\',\'"+req.container+"\'] durations: [0.7,1.5] urgency: 0.8 importancy : 0.8 weight: 0.8\"";
+      object=req.container;
+      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\']\r\nentities: [\'"+req.object+"\',\'"+req.container+"\']\r\ndurations: [0.7,1.5]\r\nurgency: 0.8\r\nimportancy : 0.8\r\nweight: 0.8\"";
       system(command.c_str());
       }
     ROS_INFO("-- TEST --"); 
