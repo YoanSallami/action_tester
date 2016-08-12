@@ -421,33 +421,20 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
 
     std::string object="";
     head_manager::Signal sig;
+    std::string command;
     //first we choose the object
     if(req.actionName == "pick"){
-        object = req.object;
-        sig.entities[0]=object;
-        sig.durations[0]=1.0;
-        sig.urgency=0.98;
-        sig.importancy=0.9;
+      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\'] entities: [\'"+req.object+"\'] durations: [1.0] urgency: 0.8 importancy : 0.8 weight: 0.8\"";
+      system(command.c_str());
     }
     if(req.actionName == "place"){
-        object = req.support;
-        sig.entities[0]=req.object;
-        sig.durations[0]=0.5;
-        sig.entities[1]=req.support;
-        sig.durations[1]=1.5;
-        sig.urgency=0.98;
-        sig.importancy=0.9;
+      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\'] entities: [\'"+req.object+"\',\'"+req.support+"\'] durations: [0.7,1.5] urgency: 0.8 importancy : 0.8 weight: 0.8\"";
+      system(command.c_str());
       }
     if(req.actionName == "drop"){
-        object = req.container;
-        sig.entities[0]=req.object;
-        sig.durations[0]=0.5;
-        sig.entities[1]=req.container;
-        sig.durations[1]=1.5;
-        sig.urgency=0.98;
-        sig.importancy=0.9;
+      command="rostopic pub /head_manager/signal head_manager/Signal \"receivers: [\'\'] entities: [\'"+req.object+"\',\'"+req.container+"\'] durations: [0.7,1.5] urgency: 0.8 importancy : 0.8 weight: 0.8\"";
+      system(command.c_str());
       }
-    signal_pub_.publish(sig);
     ROS_INFO("-- TEST --"); 
     head_manager::Action msg_srv;
     msg_srv.request.acting=true;
