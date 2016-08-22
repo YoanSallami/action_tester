@@ -425,44 +425,17 @@ bool execAction(action_tester::ExecuteAction::Request  &req, action_tester::Exec
     //first we choose the object
     if(req.actionName == "pick"){
         object = req.object;
-        // std::string entities[1];
-        // double durations[1];
-        // entities[0]=req.object;
-        // durations[0]=1.0;
-        // sig.entities=entities;
-        // sig.durations=durations;
-        // sig.urgency=0.98;
-        // sig.importancy=0.9;
     }
     if(req.actionName == "place"){
         object = req.support;
-        // std::string entities[2];
-        // double durations[2];
-        // entities[0]=req.object;
-        // entities[1]=req.support;
-        // durations[0]=0.5;
-        // durations[1]=1.5;
-        // sig.entities=entities;
-        // sig.durations=durations;
-        // sig.urgency=0.98;
-        // sig.importancy=0.9;
       }
     if(req.actionName == "drop"){
         object = req.container;
-        // std::string entities[2];
-        // double durations[2];
-        // entities[0]=req.object;
-        // entities[1]=req.container;
-        // durations[0]=1.5
-        // durations[1]=0.5;
-        // sig.entities=entities;
-        // sig.durations=durations;
-        // sig.urgency=0.98;
-        // sig.importancy=0.9;
       }
-    // ROS_INFO("publishing %s signal",req.actionName.c_str()); 
-    // signal_pub_.publish(sig);
-    
+    if (req.actionName == "stackObj")
+    {
+      object = req.support;/* code */
+    }    
     head_manager::Action msg_srv;
     msg_srv.request.acting=true;
     msg_srv.request.object=object;
